@@ -1,0 +1,13 @@
+package ir.nahad.makanzaman
+
+import android.app.Application
+import ir.map.sdk_map.Mapir
+
+class AppController:Application() {
+    override fun onCreate() {
+        super.onCreate()
+        Mapir.getInstance(this, "eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiIsImp0aSI6ImYwYjQ2M2U3ZmFlZTgxOGQyYWRlZDgyNGQ5Y2Y2NjkwMGEwNjhlMDdjMDkzOTYyMzNiZDFjOTg4YTNkMjRlODIwNzJjZmRjZDE0MDM3ZjIwIn0.eyJhdWQiOiIxMzgyNCIsImp0aSI6ImYwYjQ2M2U3ZmFlZTgxOGQyYWRlZDgyNGQ5Y2Y2NjkwMGEwNjhlMDdjMDkzOTYyMzNiZDFjOTg4YTNkMjRlODIwNzJjZmRjZDE0MDM3ZjIwIiwiaWF0IjoxNjIwMDI2MDg0LCJuYmYiOjE2MjAwMjYwODQsImV4cCI6MTYyMjYxODA4NCwic3ViIjoiIiwic2NvcGVzIjpbImJhc2ljIl19.Icn6mRTkdeLsEoRKmjTKlDRiIXVfYqQ2rE0hNRzLup3GQgaIZonS6pG3-rcuF0dPH8oVOaNB-cxwz_tYI_0I3BIWx217TEDy8KRYZLFSz7k-4NjH26DlayHM3-QAQ8zwZmISYRoGx4eqo2SGcc50UrBVvEGhCdAwfIDcx-DEpsZ6nvoMVBRIpDimgTboiRLgcyKl28ANeg9jllVHA9A6s--EjohWMz853R3IMW8OdfOzNm37bn-JNPptXaZz_hWL8UUdj1_59ykRfDPbNS353Lm0AmGibmmFuui53_MHKIEbpO8UgdcgjwS7nlRF_oz0dStEJaWow3nf6MODK5bVwA");
+
+
+    }
+}
