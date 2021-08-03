@@ -113,7 +113,7 @@ var dist = distance(loc.latitude , loc.longitude , latSaved!!.toDouble(),lngSave
             Log.d("Satus" , status.toString())
 
             if (status == " 0 "){
-                if (dist2.toInt() < 150) {
+                if (dist2.toInt() < 50) {
 
                     strat(username)
                 }
