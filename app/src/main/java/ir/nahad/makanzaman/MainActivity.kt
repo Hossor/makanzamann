@@ -9,10 +9,12 @@ import android.location.LocationListener
 import android.location.LocationManager
 import android.os.Bundle
 import android.util.Log
+import android.widget.LinearLayout
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import androidx.recyclerview.widget.LinearLayoutManager
 import com.android.volley.Request
 import com.android.volley.Response
 import com.android.volley.toolbox.StringRequest
@@ -20,6 +22,7 @@ import com.android.volley.toolbox.Volley
 import com.mapbox.mapboxsdk.geometry.LatLng
 import kotlinx.android.synthetic.main.activity_main.*
 import org.json.JSONArray
+import java.util.ArrayList
 
 
 class MainActivity : AppCompatActivity() {
@@ -88,6 +91,8 @@ var dist = distance(loc.latitude , loc.longitude , latSaved!!.toDouble(),lngSave
         var requestString = StringRequest(Request.Method.GET , url , Response.Listener { response->
           var worksheetJson = JSONArray(response)
             var worksheetsize = worksheetJson.length()
+            val data = ArrayList<worksheetItems>()
+
             for (i in 0 .. worksheetsize)
             {
                 var date = worksheetJson.getJSONObject(i).optString("date")
@@ -95,9 +100,12 @@ var dist = distance(loc.latitude , loc.longitude , latSaved!!.toDouble(),lngSave
                 var end = worksheetJson.getJSONObject(i).optString("finish")
                 var karkerd = "111" //worksheetJson.getJSONObject(i).optString("")
                 var worksheetitems:worksheetItems = worksheetItems(start,end ,date ,karkerd)
-
+                recyWorksheet.layoutManager = LinearLayoutManager(this)
+                data.add(worksheetitems)
 
             }
+            val adapter = worksheetAdapter(data)
+            recyWorksheet.adapter = adapter
         } , Response.ErrorListener {
 
         })
