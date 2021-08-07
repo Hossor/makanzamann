@@ -44,7 +44,8 @@ class Login : AppCompatActivity() {
                 login_btn.loadingFailed()
                 // login_btn.resetAfterFailed
             } else if (res.contains("successfully")) {
-                if (res.contains("active")) {
+Log.d("checkRes" , res.replace('"' , ' ') )
+                if (res.replace('"' , ' ').contains("active")) {
                     var mainIntent:Intent = Intent(this , MainActivity::class.java)
                     mainIntent.putExtra(namePut , username)
                     startActivity(mainIntent)

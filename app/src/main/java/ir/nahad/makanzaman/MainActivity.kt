@@ -5,7 +5,6 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.content.SharedPreferences
 import android.content.pm.PackageManager
-import android.location.Location
 import android.location.LocationListener
 import android.location.LocationManager
 import android.os.Bundle
@@ -40,6 +39,7 @@ class MainActivity : AppCompatActivity() {
             //.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, this);
 
         getLoctionfromApi(username)
+        getWorksheet(username)
 
         if (ContextCompat.checkSelfPermission(
                 this@MainActivity,
@@ -82,6 +82,28 @@ var dist = distance(loc.latitude , loc.longitude , latSaved!!.toDouble(),lngSave
 
     }
 
+    private fun getWorksheet(username: String) {
+        var queue = Volley.newRequestQueue(this)
+        var url ="http://makanzaman.ir/api/workSheet?username=$username"
+        var requestString = StringRequest(Request.Method.GET , url , Response.Listener { response->
+          var worksheetJson = JSONArray(response)
+            var worksheetsize = worksheetJson.length()
+            for (i in 0 .. worksheetsize)
+            {
+                var date = worksheetJson.getJSONObject(i).optString("date")
+                var start = worksheetJson.getJSONObject(i).optString("start")
+                var end = worksheetJson.getJSONObject(i).optString("finish")
+                var karkerd = "111" //worksheetJson.getJSONObject(i).optString("")
+                var worksheetitems:worksheetItems = worksheetItems(start,end ,date ,karkerd)
+
+
+            }
+        } , Response.ErrorListener {
+
+        })
+        queue.add(requestString)
+    }
+
     private fun distance(lat1: Double, lon1: Double, lat2: Double, lon2: Double): Double {
         val theta = lon1 - lon2
         var dist = (Math.sin(deg2rad(lat1))
@@ -113,7 +135,7 @@ var dist = distance(loc.latitude , loc.longitude , latSaved!!.toDouble(),lngSave
             Log.d("Satus" , status.toString())
 
             if (status == " 0 "){
-                if (dist2.toInt() < 50) {
+                if (dist2.toInt() < 100) {
 
                     strat(username)
                 }
@@ -218,10 +240,10 @@ var dist = distance(loc.latitude , loc.longitude , latSaved!!.toDouble(),lngSave
     }
     @SuppressLint("MissingPermission")
     private fun getLocation():LatLng {
-        val lm = getSystemService(Context.LOCATION_SERVICE) as LocationManager
+        val lm = getSystemService(LOCATION_SERVICE) as LocationManager
         val location = lm.getLastKnownLocation(LocationManager.GPS_PROVIDER)
-        val longitude = location!!.longitude
-        val latitude = location.latitude
+        var longitude = location!!.longitude
+        var latitude = location!!.latitude
         Log.d("Satus", "Lng: "+longitude.toString() + " lat: " + latitude)
         var loc = LatLng(latitude, longitude)
         return loc
