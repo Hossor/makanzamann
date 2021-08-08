@@ -200,7 +200,7 @@ var dist = distance(loc.latitude , loc.longitude , latSaved!!.toDouble(),lngSave
 
     private fun strat(username:String) {
         var queue = Volley.newRequestQueue(this)
-        var url = "http://makanzaman.ir/api/WorkSheet?username=${username}"
+        var url = "http://makanzaman.ir/api/WorkSheet?usernameinsert=${username}"
         var requestString = StringRequest(Request.Method.GET , url , Response.Listener {response->
 
                                                                                        Log.d("StartApi" , response.toString())
