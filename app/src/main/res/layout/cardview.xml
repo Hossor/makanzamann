@@ -4,6 +4,11 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:background="@drawable/backgrounpanel"
+    android:backgroundTint="@color/BabyBlue"
+    app:cardElevation="0dp"
+    android:layout_marginRight="5dp"
+    android:layout_marginTop="2dp"
+    android:layout_marginLeft="5dp"
     android:layout_height="90dp">
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"

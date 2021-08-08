@@ -5,11 +5,11 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.content.SharedPreferences
 import android.content.pm.PackageManager
+import android.location.Location
 import android.location.LocationListener
 import android.location.LocationManager
 import android.os.Bundle
 import android.util.Log
-import android.widget.LinearLayout
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
@@ -22,18 +22,18 @@ import com.android.volley.toolbox.Volley
 import com.mapbox.mapboxsdk.geometry.LatLng
 import kotlinx.android.synthetic.main.activity_main.*
 import org.json.JSONArray
-import java.util.ArrayList
+import java.util.*
 
 
 class MainActivity : AppCompatActivity() {
     var username :String = ""
-    protected var locationManager: LocationManager? = null
     protected var locationListener: LocationListener? = null
     @SuppressLint("MissingPermission")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         var getUsername = intent.extras
+        getSupportActionBar()!!.hide();
         username = "1"//getUsername!!.getString("usernameLogin").toString()
         getTime()
         var status = true
@@ -89,8 +89,9 @@ var dist = distance(loc.latitude , loc.longitude , latSaved!!.toDouble(),lngSave
         var queue = Volley.newRequestQueue(this)
         var url ="http://makanzaman.ir/api/workSheet?username=$username"
         var requestString = StringRequest(Request.Method.GET , url , Response.Listener { response->
+            Log.d("RESPONSS" , response)
           var worksheetJson = JSONArray(response)
-            var worksheetsize = worksheetJson.length()
+            var worksheetsize = worksheetJson.length()-1
             val data = ArrayList<worksheetItems>()
 
             for (i in 0 .. worksheetsize)
@@ -246,15 +247,43 @@ var dist = distance(loc.latitude , loc.longitude , latSaved!!.toDouble(),lngSave
             }
         }
     }
-    @SuppressLint("MissingPermission")
+    private val REQUEST_LOCATION = 1
+    var latitude: String? = null
+    var longitude:String? = null
     private fun getLocation():LatLng {
-        val lm = getSystemService(LOCATION_SERVICE) as LocationManager
-        val location = lm.getLastKnownLocation(LocationManager.GPS_PROVIDER)
-        var longitude = location!!.longitude
-        var latitude = location!!.latitude
-        Log.d("Satus", "Lng: "+longitude.toString() + " lat: " + latitude)
-        var loc = LatLng(latitude, longitude)
+        var locationManager: LocationManager =  getSystemService(Context.LOCATION_SERVICE) as LocationManager;
+
+        var loc :LatLng = LatLng()
+        if (ActivityCompat.checkSelfPermission(
+                this@MainActivity, Manifest.permission.ACCESS_FINE_LOCATION
+            ) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(
+                this@MainActivity, Manifest.permission.ACCESS_COARSE_LOCATION
+            ) != PackageManager.PERMISSION_GRANTED
+        ) {
+            ActivityCompat.requestPermissions(
+                this,
+                arrayOf(Manifest.permission.ACCESS_FINE_LOCATION),
+                REQUEST_LOCATION
+            )
+        } else {
+
+            var locationGPS = locationManager!!.getLastKnownLocation(LocationManager.GPS_PROVIDER)
+            if (locationGPS != null) {
+                val lat = locationGPS.latitude
+                val longi = locationGPS.longitude
+                latitude = lat.toString()
+                longitude = longi.toString()
+                loc.latitude = lat
+                loc.longitude = longi
+                Log.d("UserLocation" , latitude + longitude)
+
+            } else {
+                Toast.makeText(this, "Unable to find location.", Toast.LENGTH_SHORT).show()
+            }
+        }
         return loc
     }
+
+
 
 }
