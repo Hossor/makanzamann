@@ -141,7 +141,7 @@ var dist = distance(loc.latitude , loc.longitude , latSaved!!.toDouble(),lngSave
             var status:String =""
 
             status = response.toString().replace('"' , ' ')
-            Log.d("Satus" , status.toString())
+            Log.d("Satus2" , status.toString())
 
             if (status == " 0 "){
                 if (dist2.toInt() < 100) {
