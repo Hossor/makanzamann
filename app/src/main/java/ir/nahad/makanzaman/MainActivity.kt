@@ -5,7 +5,6 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.content.SharedPreferences
 import android.content.pm.PackageManager
-import android.location.Location
 import android.location.LocationListener
 import android.location.LocationManager
 import android.os.Bundle
@@ -14,14 +13,17 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import androidx.core.content.res.ResourcesCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.android.volley.Request
 import com.android.volley.Response
 import com.android.volley.toolbox.StringRequest
 import com.android.volley.toolbox.Volley
+import com.kaopiz.kprogresshud.KProgressHUD
 import com.mapbox.mapboxsdk.geometry.LatLng
 import kotlinx.android.synthetic.main.activity_main.*
 import org.json.JSONArray
+import www.sanju.motiontoast.MotionToast
 import java.util.*
 
 
@@ -34,6 +36,7 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
         var getUsername = intent.extras
         getSupportActionBar()!!.hide();
+
         username = "1"//getUsername!!.getString("usernameLogin").toString()
         getTime()
         var status = true
@@ -68,6 +71,11 @@ class MainActivity : AppCompatActivity() {
         }
 
         sabt.setOnClickListener {
+            val hud = KProgressHUD.create(this@MainActivity)
+                .setStyle(KProgressHUD.Style.ANNULAR_DETERMINATE)
+                .setLabel("لطفا منتظر بمانید")
+                .setMaxProgress(100)
+                .show()
             var shPref:SharedPreferences
             shPref = getSharedPreferences("latlng" , Context.MODE_PRIVATE)
             var latSaved = shPref.getString("lat" , null)
@@ -75,12 +83,14 @@ class MainActivity : AppCompatActivity() {
 
             var loc = getLocation()
 
+
 var dist = distance(loc.latitude , loc.longitude , latSaved!!.toDouble(),lngSaved!!.toDouble())
             var dist2 = String.format("%.0f" , dist)
 
-                checkstatus(username ,dist2)
+                checkstatus(username ,dist2 , hud)
 
             Log.d("Satus", status.toString()+", " +latSaved+","+lngSaved+","+loc+" "+dist)
+
         }
 
     }
@@ -99,7 +109,7 @@ var dist = distance(loc.latitude , loc.longitude , latSaved!!.toDouble(),lngSave
                 var date = worksheetJson.getJSONObject(i).optString("date")
                 var start = worksheetJson.getJSONObject(i).optString("start")
                 var end = worksheetJson.getJSONObject(i).optString("finish")
-                var karkerd = "111" //worksheetJson.getJSONObject(i).optString("")
+                var karkerd = worksheetJson.getJSONObject(i).optString("karked")
                 var worksheetitems:worksheetItems = worksheetItems(start,end ,date ,karkerd)
                 recyWorksheet.layoutManager = LinearLayoutManager(this)
                 data.add(worksheetitems)
@@ -133,7 +143,7 @@ var dist = distance(loc.latitude , loc.longitude , latSaved!!.toDouble(),lngSave
         return rad * 180.0 / Math.PI
     }
 
-    private fun checkstatus(username: String , dist2:String) {
+    private fun checkstatus(username: String, dist2: String, hud: KProgressHUD) {
 
         var queue = Volley.newRequestQueue(this)
         var url ="http://makanzaman.ir/api/WorkSheet?usernameGettime=$username"
@@ -145,16 +155,24 @@ var dist = distance(loc.latitude , loc.longitude , latSaved!!.toDouble(),lngSave
 
             if (status == " 0 "){
                 if (dist2.toInt() < 100) {
+                    hud.setProgress(10)
 
-                    strat(username)
+                    strat(username , hud)
+                    getenter(username , hud)
+
+
                 }
             else{
                 Toast.makeText(this , "شما در موقعیت ثبت شده نمیباشید",Toast.LENGTH_SHORT).show()
+ hud.dismiss()
             }
             }
             else
             {
                 finishKar(username)
+                getWorksheet(username)
+                enterPersonel.text = "--:--"
+
             }
         } , Response.ErrorListener {
 
@@ -197,14 +215,38 @@ var dist = distance(loc.latitude , loc.longitude , latSaved!!.toDouble(),lngSave
         })
         queue.add(requestString)
     }
+    private fun getenter(username: String, hud: KProgressHUD) {
+        var queue = Volley.newRequestQueue(this)
+        var url = "http://makanzaman.ir/api/getStartToday?username=${username}"
+        var requestString = StringRequest(Request.Method.GET , url , Response.Listener {response->
+            var enter = response.replace('"' , 0.toChar()).toString()
+            enterPersonel.text =  enter
+            Log.d("StartApi" , enter)
+            hud.setProgress(100)
 
-    private fun strat(username:String) {
+            MotionToast.createToast(this,
+                "Hurray success 😍"
+                "Upload Completed successfully!",
+                MotionToast.TOAST_SUCCESS,
+                MotionToast.GRAVITY_BOTTOM,
+                MotionToast.LONG_DURATION,
+                ResourcesCompat.getFont(this,R.font.helvetica_regular))
+        },Response.ErrorListener {
+
+        })
+        queue.add(requestString)
+    }
+
+
+    private fun strat(username: String, hud: KProgressHUD) {
         var queue = Volley.newRequestQueue(this)
         var url = "http://makanzaman.ir/api/WorkSheet?usernameinsert=${username}"
         var requestString = StringRequest(Request.Method.GET , url , Response.Listener {response->
 
-                                                                                       Log.d("StartApi" , response.toString())
+            hud.setProgress(50)
+            Log.d("StartApi" , response.toString())
         },Response.ErrorListener {
+
 
         })
         queue.add(requestString)
@@ -278,7 +320,7 @@ var dist = distance(loc.latitude , loc.longitude , latSaved!!.toDouble(),lngSave
                 Log.d("UserLocation" , latitude + longitude)
 
             } else {
-                Toast.makeText(this, "Unable to find location.", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this, "مشکلی در دریافت موقعیت شما پیش امده است", Toast.LENGTH_SHORT).show()
             }
         }
         return loc

@@ -17,10 +17,10 @@ class worksheetAdapter (private val worksheetlist:List<worksheetItems>):
 
     override fun onBindViewHolder(holder: worksheetAdapter.ViewHolder, position: Int) {
         val item = worksheetlist[position]
-        holder.Start.text = item.start
-        holder.End.text = item.end
-        holder.Date.text = item.date
-        holder.worksheet.text = item.karkerd
+        holder.Start.text = "شروع: "+item.start
+        holder.End.text = "پایان: "+item.end
+        holder.Date.text = "تاریخ: "+item.date
+        holder.worksheet.text = "کارکرد: "+item.karkerd
     }
 
     override fun getItemCount(): Int {
